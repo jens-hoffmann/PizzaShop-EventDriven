@@ -1,0 +1,845 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://pizzashop.example/schemas/event-envelope.schema.json",
+  "title": "EventEnvelope",
+  "type": "object",
+  "required": [
+    "eventId",
+    "eventType",
+    "eventVersion",
+    "occurredAt",
+    "producer",
+    "correlationId",
+    "aggregateId",
+    "payload"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "eventId": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "eventType": {
+      "type": "string",
+      "enum": [
+        "catalog.pizza-created",
+        "catalog.pizza-updated",
+        "catalog.pizza-availability-changed",
+        "order.placed",
+        "order.paid",
+        "order.payment-failed",
+        "order.cancelled",
+        "order.completed",
+        "order.status-changed",
+        "payment.succeeded",
+        "payment.failed",
+        "payment.refunded",
+        "kitchen.ticket-accepted",
+        "kitchen.preparation-started",
+        "kitchen.order-ready",
+        "kitchen.ticket-cancelled"
+      ]
+    },
+    "eventVersion": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "occurredAt": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "producer": {
+      "type": "string",
+      "minLength": 1
+    },
+    "correlationId": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "causationId": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "format": "uuid"
+    },
+    "aggregateId": {
+      "type": "string",
+      "minLength": 1
+    },
+    "payload": {
+      "type": "object"
+    }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "eventType": {
+            "const": "catalog.pizza-created"
+          }
+        },
+        "required": [
+          "eventType"
+        ]
+      },
+      "then": {
+        "properties": {
+          "payload": {
+            "$ref": "#/$defs/PizzaSnapshot"
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "eventType": {
+            "const": "catalog.pizza-updated"
+          }
+        },
+        "required": [
+          "eventType"
+        ]
+      },
+      "then": {
+        "properties": {
+          "payload": {
+            "$ref": "#/$defs/PizzaSnapshot"
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "eventType": {
+            "const": "catalog.pizza-availability-changed"
+          }
+        },
+        "required": [
+          "eventType"
+        ]
+      },
+      "then": {
+        "properties": {
+          "payload": {
+            "$ref": "#/$defs/PizzaAvailabilityChanged"
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "eventType": {
+            "const": "order.placed"
+          }
+        },
+        "required": [
+          "eventType"
+        ]
+      },
+      "then": {
+        "properties": {
+          "payload": {
+            "$ref": "#/$defs/OrderPlaced"
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "eventType": {
+            "const": "order.paid"
+          }
+        },
+        "required": [
+          "eventType"
+        ]
+      },
+      "then": {
+        "properties": {
+          "payload": {
+            "$ref": "#/$defs/OrderPaid"
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "eventType": {
+            "const": "order.payment-failed"
+          }
+        },
+        "required": [
+          "eventType"
+        ]
+      },
+      "then": {
+        "properties": {
+          "payload": {
+            "$ref": "#/$defs/OrderPaymentFailed"
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "eventType": {
+            "const": "order.cancelled"
+          }
+        },
+        "required": [
+          "eventType"
+        ]
+      },
+      "then": {
+        "properties": {
+          "payload": {
+            "$ref": "#/$defs/OrderCancelled"
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "eventType": {
+            "const": "order.completed"
+          }
+        },
+        "required": [
+          "eventType"
+        ]
+      },
+      "then": {
+        "properties": {
+          "payload": {
+            "$ref": "#/$defs/OrderCompleted"
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "eventType": {
+            "const": "order.status-changed"
+          }
+        },
+        "required": [
+          "eventType"
+        ]
+      },
+      "then": {
+        "properties": {
+          "payload": {
+            "$ref": "#/$defs/OrderStatusChanged"
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "eventType": {
+            "const": "payment.succeeded"
+          }
+        },
+        "required": [
+          "eventType"
+        ]
+      },
+      "then": {
+        "properties": {
+          "payload": {
+            "$ref": "#/$defs/PaymentSucceeded"
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "eventType": {
+            "const": "payment.failed"
+          }
+        },
+        "required": [
+          "eventType"
+        ]
+      },
+      "then": {
+        "properties": {
+          "payload": {
+            "$ref": "#/$defs/PaymentFailed"
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "eventType": {
+            "const": "payment.refunded"
+          }
+        },
+        "required": [
+          "eventType"
+        ]
+      },
+      "then": {
+        "properties": {
+          "payload": {
+            "$ref": "#/$defs/PaymentRefunded"
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "eventType": {
+            "const": "kitchen.ticket-accepted"
+          }
+        },
+        "required": [
+          "eventType"
+        ]
+      },
+      "then": {
+        "properties": {
+          "payload": {
+            "$ref": "#/$defs/KitchenTicketAccepted"
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "eventType": {
+            "const": "kitchen.preparation-started"
+          }
+        },
+        "required": [
+          "eventType"
+        ]
+      },
+      "then": {
+        "properties": {
+          "payload": {
+            "$ref": "#/$defs/PreparationStarted"
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "eventType": {
+            "const": "kitchen.order-ready"
+          }
+        },
+        "required": [
+          "eventType"
+        ]
+      },
+      "then": {
+        "properties": {
+          "payload": {
+            "$ref": "#/$defs/OrderReady"
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "eventType": {
+            "const": "kitchen.ticket-cancelled"
+          }
+        },
+        "required": [
+          "eventType"
+        ]
+      },
+      "then": {
+        "properties": {
+          "payload": {
+            "$ref": "#/$defs/KitchenTicketCancelled"
+          }
+        }
+      }
+    }
+  ],
+  "$defs": {
+    "Money": {
+      "type": "number"
+    },
+    "PizzaSnapshot": {
+      "type": "object",
+      "required": [
+        "pizzaId",
+        "name",
+        "available",
+        "prices",
+        "updatedAt"
+      ],
+      "properties": {
+        "pizzaId": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "name": {
+          "type": "string",
+          "minLength": 1
+        },
+        "description": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "available": {
+          "type": "boolean"
+        },
+        "prices": {
+          "type": "object",
+          "additionalProperties": {
+            "$ref": "#/$defs/Money"
+          }
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time"
+        }
+      }
+    },
+    "PizzaAvailabilityChanged": {
+      "type": "object",
+      "required": [
+        "pizzaId",
+        "available",
+        "updatedAt"
+      ],
+      "properties": {
+        "pizzaId": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "available": {
+          "type": "boolean"
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time"
+        }
+      }
+    },
+    "OrderLine": {
+      "type": "object",
+      "required": [
+        "pizzaId",
+        "name",
+        "size",
+        "unitPrice",
+        "quantity",
+        "lineTotal"
+      ],
+      "properties": {
+        "pizzaId": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "name": {
+          "type": "string"
+        },
+        "size": {
+          "type": "string",
+          "enum": [
+            "SMALL",
+            "MEDIUM",
+            "LARGE"
+          ]
+        },
+        "unitPrice": {
+          "$ref": "#/$defs/Money"
+        },
+        "quantity": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "lineTotal": {
+          "$ref": "#/$defs/Money"
+        }
+      }
+    },
+    "DeliveryAddress": {
+      "type": "object",
+      "required": [
+        "street",
+        "city",
+        "postalCode"
+      ],
+      "properties": {
+        "street": {
+          "type": "string"
+        },
+        "city": {
+          "type": "string"
+        },
+        "postalCode": {
+          "type": "string"
+        }
+      }
+    },
+    "OrderPlaced": {
+      "type": "object",
+      "required": [
+        "orderId",
+        "customerId",
+        "items",
+        "total",
+        "currency",
+        "deliveryAddress",
+        "placedAt"
+      ],
+      "properties": {
+        "orderId": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "customerId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "items": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "$ref": "#/$defs/OrderLine"
+          }
+        },
+        "total": {
+          "$ref": "#/$defs/Money"
+        },
+        "currency": {
+          "type": "string"
+        },
+        "deliveryAddress": {
+          "$ref": "#/$defs/DeliveryAddress"
+        },
+        "placedAt": {
+          "type": "string",
+          "format": "date-time"
+        }
+      }
+    },
+    "OrderPaid": {
+      "type": "object",
+      "required": [
+        "orderId",
+        "paymentId",
+        "paidAt"
+      ],
+      "properties": {
+        "orderId": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "paymentId": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "paidAt": {
+          "type": "string",
+          "format": "date-time"
+        }
+      }
+    },
+    "OrderPaymentFailed": {
+      "type": "object",
+      "required": [
+        "orderId",
+        "reason",
+        "failedAt"
+      ],
+      "properties": {
+        "orderId": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "reason": {
+          "type": "string"
+        },
+        "failedAt": {
+          "type": "string",
+          "format": "date-time"
+        }
+      }
+    },
+    "OrderCancelled": {
+      "type": "object",
+      "required": [
+        "orderId",
+        "reason",
+        "cancelledAt",
+        "wasPaid"
+      ],
+      "properties": {
+        "orderId": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "reason": {
+          "type": "string"
+        },
+        "cancelledAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "wasPaid": {
+          "type": "boolean"
+        }
+      }
+    },
+    "OrderCompleted": {
+      "type": "object",
+      "required": [
+        "orderId",
+        "completedAt"
+      ],
+      "properties": {
+        "orderId": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "completedAt": {
+          "type": "string",
+          "format": "date-time"
+        }
+      }
+    },
+    "OrderStatusChanged": {
+      "type": "object",
+      "required": [
+        "orderId",
+        "customerId",
+        "previousStatus",
+        "newStatus",
+        "occurredAt"
+      ],
+      "properties": {
+        "orderId": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "customerId": {
+          "type": "string"
+        },
+        "previousStatus": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "newStatus": {
+          "type": "string"
+        },
+        "reason": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "occurredAt": {
+          "type": "string",
+          "format": "date-time"
+        }
+      }
+    },
+    "PaymentSucceeded": {
+      "type": "object",
+      "required": [
+        "paymentId",
+        "orderId",
+        "amount",
+        "currency",
+        "paidAt"
+      ],
+      "properties": {
+        "paymentId": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "orderId": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "amount": {
+          "$ref": "#/$defs/Money"
+        },
+        "currency": {
+          "type": "string"
+        },
+        "paidAt": {
+          "type": "string",
+          "format": "date-time"
+        }
+      }
+    },
+    "PaymentFailed": {
+      "type": "object",
+      "required": [
+        "paymentId",
+        "orderId",
+        "reason",
+        "failedAt"
+      ],
+      "properties": {
+        "paymentId": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "orderId": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "reason": {
+          "type": "string"
+        },
+        "failedAt": {
+          "type": "string",
+          "format": "date-time"
+        }
+      }
+    },
+    "PaymentRefunded": {
+      "type": "object",
+      "required": [
+        "paymentId",
+        "orderId",
+        "amount",
+        "refundedAt",
+        "reason"
+      ],
+      "properties": {
+        "paymentId": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "orderId": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "amount": {
+          "$ref": "#/$defs/Money"
+        },
+        "refundedAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "reason": {
+          "type": "string"
+        }
+      }
+    },
+    "KitchenTicketAccepted": {
+      "type": "object",
+      "required": [
+        "ticketId",
+        "orderId",
+        "acceptedAt"
+      ],
+      "properties": {
+        "ticketId": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "orderId": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "acceptedAt": {
+          "type": "string",
+          "format": "date-time"
+        }
+      }
+    },
+    "PreparationStarted": {
+      "type": "object",
+      "required": [
+        "ticketId",
+        "orderId",
+        "startedAt"
+      ],
+      "properties": {
+        "ticketId": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "orderId": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "startedAt": {
+          "type": "string",
+          "format": "date-time"
+        }
+      }
+    },
+    "OrderReady": {
+      "type": "object",
+      "required": [
+        "ticketId",
+        "orderId",
+        "readyAt"
+      ],
+      "properties": {
+        "ticketId": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "orderId": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "readyAt": {
+          "type": "string",
+          "format": "date-time"
+        }
+      }
+    },
+    "KitchenTicketCancelled": {
+      "type": "object",
+      "required": [
+        "ticketId",
+        "orderId",
+        "reason",
+        "cancelledAt"
+      ],
+      "properties": {
+        "ticketId": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "orderId": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "reason": {
+          "type": "string"
+        },
+        "cancelledAt": {
+          "type": "string",
+          "format": "date-time"
+        }
+      }
+    }
+  }
+}

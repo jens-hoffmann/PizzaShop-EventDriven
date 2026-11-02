@@ -1,0 +1,234 @@
+openapi: 3.1.0
+info:
+  title: Pizza Shop Catalog API
+  version: 1.0.0
+  description: Menu catalog with pizzas, sizes, prices and availability.
+servers:
+  - url: http://localhost:8081
+tags:
+  - name: Pizzas
+  - name: Admin Pizzas
+paths:
+  /api/v1/pizzas:
+    get:
+      tags: [Pizzas]
+      operationId: listPizzas
+      summary: List pizzas
+      parameters:
+        - name: ids
+          in: query
+          required: false
+          schema:
+            type: array
+            items:
+              type: string
+              format: uuid
+          description: Optional list of pizza ids to fetch in one call.
+        - name: available
+          in: query
+          required: false
+          schema:
+            type: boolean
+          description: Filter by availability.
+      responses:
+        '200':
+          description: Pizzas
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/PizzaResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+  /api/v1/pizzas/{id}:
+    get:
+      tags: [Pizzas]
+      operationId: getPizza
+      summary: Get a pizza by id
+      parameters:
+        - $ref: '#/components/parameters/PizzaId'
+      responses:
+        '200':
+          description: Pizza
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PizzaResponse'
+        '404':
+          $ref: '#/components/responses/NotFound'
+  /api/v1/admin/pizzas:
+    post:
+      tags: [Admin Pizzas]
+      operationId: createPizza
+      summary: Create a pizza
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PizzaUpsertRequest'
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PizzaResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+  /api/v1/admin/pizzas/{id}:
+    put:
+      tags: [Admin Pizzas]
+      operationId: updatePizza
+      summary: Replace a pizza
+      parameters:
+        - $ref: '#/components/parameters/PizzaId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PizzaUpsertRequest'
+      responses:
+        '200':
+          description: Updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PizzaResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+    delete:
+      tags: [Admin Pizzas]
+      operationId: deletePizza
+      summary: Delete a pizza
+      parameters:
+        - $ref: '#/components/parameters/PizzaId'
+      responses:
+        '204':
+          description: Deleted
+        '404':
+          $ref: '#/components/responses/NotFound'
+  /api/v1/admin/pizzas/{id}/availability:
+    patch:
+      tags: [Admin Pizzas]
+      operationId: updatePizzaAvailability
+      summary: Change pizza availability
+      parameters:
+        - $ref: '#/components/parameters/PizzaId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AvailabilityRequest'
+      responses:
+        '200':
+          description: Updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PizzaResponse'
+        '404':
+          $ref: '#/components/responses/NotFound'
+components:
+  parameters:
+    PizzaId:
+      name: id
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+  responses:
+    BadRequest:
+      description: Invalid request
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/Problem'
+    NotFound:
+      description: Resource not found
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/Problem'
+  schemas:
+    PizzaSize:
+      type: string
+      enum: [SMALL, MEDIUM, LARGE]
+    PizzaResponse:
+      type: object
+      required: [id, name, available, prices, createdAt, updatedAt]
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+        description:
+          type: string
+        available:
+          type: boolean
+        prices:
+          type: object
+          additionalProperties:
+            type: number
+            format: double
+          description: Price in EUR per size.
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+    PizzaUpsertRequest:
+      type: object
+      required: [name, prices]
+      properties:
+        name:
+          type: string
+          minLength: 1
+          maxLength: 120
+        description:
+          type: string
+          maxLength: 500
+        available:
+          type: boolean
+          default: true
+        prices:
+          type: object
+          additionalProperties:
+            type: number
+            format: double
+          description: Price in EUR per size. Must contain SMALL, MEDIUM and LARGE.
+    AvailabilityRequest:
+      type: object
+      required: [available]
+      properties:
+        available:
+          type: boolean
+    Problem:
+      type: object
+      properties:
+        type:
+          type: string
+        title:
+          type: string
+        status:
+          type: integer
+        detail:
+          type: string
+        instance:
+          type: string
+        code:
+          type: string
+        traceId:
+          type: string
+        errors:
+          type: array
+          items:
+            type: string

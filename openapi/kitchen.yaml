@@ -1,0 +1,116 @@
+openapi: 3.1.0
+info:
+  title: Pizza Shop Kitchen API
+  version: 1.0.0
+  description: Read-only view of kitchen tickets.
+servers:
+  - url: http://localhost:8083
+tags:
+  - name: Kitchen Tickets
+paths:
+  /api/v1/kitchen/tickets:
+    get:
+      tags: [Kitchen Tickets]
+      operationId: listKitchenTickets
+      summary: List kitchen tickets
+      parameters:
+        - name: status
+          in: query
+          required: false
+          schema:
+            $ref: '#/components/schemas/KitchenTicketStatus'
+      responses:
+        '200':
+          description: Tickets
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/KitchenTicketResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+  /api/v1/kitchen/tickets/{id}:
+    get:
+      tags: [Kitchen Tickets]
+      operationId: getKitchenTicket
+      summary: Get a kitchen ticket
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Ticket
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/KitchenTicketResponse'
+        '404':
+          $ref: '#/components/responses/NotFound'
+components:
+  responses:
+    BadRequest:
+      description: Invalid request
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/Problem'
+    NotFound:
+      description: Resource not found
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/Problem'
+  schemas:
+    KitchenTicketStatus:
+      type: string
+      enum: [ACCEPTED, PREPARING, READY, CANCELLED]
+    KitchenTicketResponse:
+      type: object
+      required: [id, orderId, status, acceptedAt]
+      properties:
+        id:
+          type: string
+          format: uuid
+        orderId:
+          type: string
+          format: uuid
+        status:
+          $ref: '#/components/schemas/KitchenTicketStatus'
+        acceptedAt:
+          type: string
+          format: date-time
+        preparationStartedAt:
+          type: string
+          format: date-time
+        readyAt:
+          type: string
+          format: date-time
+        cancelledAt:
+          type: string
+          format: date-time
+    Problem:
+      type: object
+      properties:
+        type:
+          type: string
+        title:
+          type: string
+        status:
+          type: integer
+        detail:
+          type: string
+        instance:
+          type: string
+        code:
+          type: string
+        traceId:
+          type: string
+        errors:
+          type: array
+          items:
+            type: string

@@ -1,0 +1,89 @@
+openapi: 3.1.0
+info:
+  title: Pizza Shop Payments API
+  version: 1.0.0
+  description: Debug view of simulated payments.
+servers:
+  - url: http://localhost:8084
+tags:
+  - name: Payments
+paths:
+  /api/v1/payments/orders/{orderId}:
+    get:
+      tags: [Payments]
+      operationId: getPaymentByOrderId
+      summary: Get the payment of an order
+      parameters:
+        - name: orderId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Payment
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaymentResponse'
+        '404':
+          $ref: '#/components/responses/NotFound'
+components:
+  responses:
+    NotFound:
+      description: Resource not found
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/Problem'
+  schemas:
+    PaymentStatus:
+      type: string
+      enum: [PENDING, SUCCEEDED, FAILED, REFUNDED]
+    PaymentResponse:
+      type: object
+      required: [id, orderId, amount, currency, status, createdAt, updatedAt]
+      properties:
+        id:
+          type: string
+          format: uuid
+        orderId:
+          type: string
+          format: uuid
+        amount:
+          type: number
+          format: double
+        currency:
+          type: string
+        status:
+          $ref: '#/components/schemas/PaymentStatus'
+        failureReason:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+    Problem:
+      type: object
+      properties:
+        type:
+          type: string
+        title:
+          type: string
+        status:
+          type: integer
+        detail:
+          type: string
+        instance:
+          type: string
+        code:
+          type: string
+        traceId:
+          type: string
+        errors:
+          type: array
+          items:
+            type: string
